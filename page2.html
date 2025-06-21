@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Cube with Mirror Swipe</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      touch-action: none;
+    }
+
+    .scene {
+      width: 100vw;
+      height: 100vh;
+      perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cube {
+      width: 150px;
+      height: 150px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.1s linear;
+      border-radius: 20px;
+    }
+
+    .face {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+      border: 1px solid rgba(255,255,255,0.05);
+    
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+
+  border-radius: 30px;
+   background-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+   
+    }
+
+.face::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: translateZ(700px) scale(1.2);
+  filter: brightness(2) blur(5px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+    .active .face::after {
+      opacity: 0.35;
+    }
+    
+    @keyframes pulse-rotate {
+  0% { transform: rotateX(-20deg) rotateY(20deg); }
+  50% { transform: rotateX(-25deg) rotateY(25deg); }
+  100% { transform: rotateX(-20deg) rotateY(20deg); }
+}
+
+#cube.starting {
+  animation: pulse-rotate 2s ease-in-out;
+}
+
+    .front  { transform: rotateY(  0deg) translateZ(75px);  background-image: url('sayantika1.jpg'); }
+    .back   { transform: rotateY(180deg) translateZ(75px);  background-image: url('sayantika2.jpg'); }
+    .right  { transform: rotateY( 90deg) translateZ(75px);  background-image: url('sayantika3.jpg'); }
+    .left   { transform: rotateY(-90deg) translateZ(75px);  background-image: url('sayantika4.jpg'); }
+    .top    { transform: rotateX( 90deg) translateZ(75px);  background-image: url('sayantika5.jpg'); }
+    .bottom { transform: rotateX(-90deg) translateZ(75px);  background-image: url('sayantika6.jpg'); }
+
+    .front::after  { background-image: url('sayantika1.jpg'); }
+    .back::after   { background-image: url('sayantika2.jpg'); }
+    .right::after  { background-image: url('sayantika3.jpg'); }
+    .left::after   { background-image: url('sayantika4.jpg'); }
+    .top::after    { background-image: url('sayantika5.jpg'); }
+    .bottom::after { background-image: url('sayantika6.jpg'); }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="cube" id="cube">
+      <div class="face front"></div>
+      <div class="face back"></div>
+      <div class="face right"></div>
+      <div class="face left"></div>
+      <div class="face top"></div>
+      <div class="face bottom"></div>
+    </div>
+  </div>
+
+  <script>
+    const cube = document.getElementById("cube");
+
+    let rotationX = -20;
+    let rotationY = 20;
+    let startX, startY;
+    let isDragging = false;
+
+    function updateCubeTransform() {
+      cube.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+    }
+
+    updateCubeTransform();
+
+    function onStart(e) {
+      isDragging = true;
+      cube.classList.add("active");
+      const point = e.touches ? e.touches[0] : e;
+      startX = point.clientX;
+      startY = point.clientY;
+    }
+
+    function onMove(e) {
+      if (!isDragging) return;
+      const point = e.touches ? e.touches[0] : e;
+      const deltaX = point.clientX - startX;
+      const deltaY = point.clientY - startY;
+      startX = point.clientX;
+      startY = point.clientY;
+      rotationY += deltaX * 0.5;
+      rotationX -= deltaY * 0.5;
+      updateCubeTransform();
+    }
+
+    function onEnd() {
+      isDragging = false;
+      cube.classList.remove("active");
+    }
+
+    // Touch
+    cube.addEventListener("touchstart", onStart);
+    cube.addEventListener("touchmove", onMove);
+    cube.addEventListener("touchend", onEnd);
+
+    // Mouse
+    cube.addEventListener("mousedown", onStart);
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onEnd);
+    
+    window.addEventListener("load", () => {
+  cube.classList.add("starting");
+  setTimeout(() => {
+    cube.classList.remove("starting");
+  }, 2000);
+});
+  </script>
+</body>
+</html>
